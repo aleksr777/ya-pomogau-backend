@@ -12,7 +12,7 @@ export interface ITasksChatEntity {
   closeChat(): Promise<this>;
 }
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable({ scope: Scope.REQUEST })
 export class TasksChatEntity {
   private metadata: TaskChatInterface | null;
   private messages: MessageInterface[];
