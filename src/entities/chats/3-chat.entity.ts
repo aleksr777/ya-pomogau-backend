@@ -62,6 +62,25 @@ export class TasksChatEntity {
     return this;
   }
 
+  async findConflictingChats(params: Partial<TaskChatInterface>): Promise<this> {
+    await this.findChatByParams(params);
+    if (!this.metadata) {
+      return this;
+    }
+    const { taskId, _id } = this.metadata;
+    const conflictChats = (await this.chatsRepository.find({
+      taskId,
+      _id: { $ne: _id },
+    })) as TaskChatInterface[];
+    if (conflictChats.length > 0) {
+      this.metadata = conflictChats[0];
+      this.messages = (await this.messagesRepository.find({
+        chatId: this.metadata._id,
+      })) as MessageInterface[];
+    }
+    return this;
+  }
+
   async addMessage(chatId: string, message: Partial<MessageInterface>): Promise<this> {
     if (!this.chatId) {
       throw new Error('Chat ID is not set');
